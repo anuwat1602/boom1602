@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy 1 Year 4 Months Anniversary! 💖</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Mitr:wght@400;500;600&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'rose-pink': '#FF80AB',
+                        'soft-pink': '#FFB6C1',
+                        'peach': '#FFDAC1',
+                        'lavender-pink': '#E1BEE7',
+                        'deep-rose': '#E91E63'
+                    },
+                    fontFamily: {
+                        kanit: ['Kanit', 'sans-serif'],
+                        mitr: ['Mitr', 'sans-serif'],
+                        sarabun: ['Sarabun', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, #ffe6eb 0%, #ffd1dc 40%, #e1bee7 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Canvas background overlay */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Custom Card Flip effect */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
+        /* Pulsing Glow Animation */
+        @keyframes pulseGlow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(255, 105, 180, 0.4),
+                            0 0 40px rgba(255, 182, 193, 0.3);
+                transform: scale(1);
+            }
+
+            50% {
+                box-shadow: 0 0 35px rgba(255, 105, 180, 0.7),
+                            0 0 60px rgba(255, 182, 193, 0.5);
+                transform: scale(1.03);
+            }
+        }
+
+        .heart-btn {
+            animation: pulseGlow 2.5s infinite ease-in-out;
+        }
+
+        /* Floating Badge Animation */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-10px) rotate(2deg);
+            }
+        }
+
+        .floating-element {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Soft glassmorphism effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        /* Custom audio wave effect */
+        .music-bar {
+            animation: bounceBar 1.2s ease-in-out infinite alternate;
+        }
+
+        .music-bar:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .music-bar:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounceBar {
+            0% {
+                height: 6px;
+            }
+
+            100% {
+                height: 22px;
+            }
+        }
+
+        /* Sparkle float effect */
+        @keyframes sparkleAnim {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scale(0.5);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translateY(-20px) scale(1.2);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-40px) scale(0.5);
+            }
+        }
+
+        .sparkle-particle {
+            position: absolute;
+            pointer-events: none;
+            animation: sparkleAnim 2s linear infinite;
+        }
+    </style>
+</head>
+
+<body class="text-gray-800 flex flex-col min-h-screen relative select-none">
+
+    <!-- Background Canvas for Floating Hearts & Particles -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Top Music Control Bar -->
+    <header class="fixed top-4 right-4 z-50">
+        <button
+            id="musicToggleBtn"
+            onclick="toggleMusic()"
+            class="glass-card px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 hover:bg-white/80 transition-all duration-300 text-rose-600 font-medium text-sm border border-rose-200"
+        >
+            <span id="musicIcon">
+                <i class="fa-solid fa-music"></i>
+            </span>
+
+            <span id="musicText">
+                เปิดดนตรีบรรยากาศ
+            </span>
+
+            <div id="musicBars" class="hidden flex items-end gap-0.5 h-6">
+                <span class="music-bar w-1 bg-rose-500 rounded-full"></span>
+                <span class="music-bar w-1 bg-rose-500 rounded-full"></span>
+                <span class="music-bar w-1 bg-rose-500 rounded-full"></span>
+            </div>
+        </button>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow container mx-auto px-4 py-8 z-10 flex flex-col items-center justify-center max-w-4xl">
+
+        <!-- Top Badge -->
+        <div class="floating-element mb-4 inline-flex items-center gap-2 px-5 py-2 rounded-full glass-card border border-pink-300 shadow-md">
+            <i class="fa-solid fa-heart text-rose-500 text-lg"></i>
+
+            <span class="font-mitr text-rose-600 font-medium tracking-wide">
+                Happy Anniversary Day
+            </span>
+
+            <i class="fa-solid fa-heart text-rose-500 text-lg"></i>
+        </div>
+
+        <!-- Big Title -->
+        <h1 class="text-4xl md:text-6xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-rose-600 via-pink-600 to-purple-600 font-mitr leading-tight mb-2 drop-shadow-sm">
+            สุขสันต์วันครบรอบ
+            <br class="md:hidden"/>
+            1 ปี 4 เดือน 💖
+        </h1>
+
+        <p class="text-base md:text-lg text-pink-700 text-center font-sarabun mb-8 max-w-md">
+            ขอบคุณสำหรับทุกรอยยิ้ม ความสุข และความทรงจำดีๆ ที่เรามีให้กันตลอด 1.4 ปีที่ผ่านมานะ
+        </p>
+
+        <!-- Interactive Surprise Button / Heart Gift -->
+        <div class="mb-10 text-center relative">
+            <button
+                id="surpriseBtn"
+                onclick="triggerHeartBurst(event)"
+                class="heart-btn relative group bg-gradient-to-tr from-rose-500 via-pink-500 to-rose-400 text-white font-bold py-5 px-10 rounded-full shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-3 mx-auto"
+            >
+                <i class="fa-solid fa-gift text-2xl group-hover:rotate-12 transition-transform duration-300"></i>
+
+                <span class="text-lg md:text-xl font-mitr">
+                    กดตรงนี้รับความรักมหาศาล ✨
+                </span>
+
+                <i class="fa-solid fa-sparkles text-xl animate-pulse"></i>
+            </button>
+
+            <p class="text-xs text-rose-500/80 mt-2 italic">
+                (ลองกดหลายๆ ครั้งได้เลยนะ)
+            </p>
+        </div>
+
+        <!-- Live Counter Section -->
+        <section class="w-full glass-card rounded-3xl p-6 md:p-8 mb-10 shadow-xl border border-white/60 relative overflow-hidden">
+
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-pink-300/30 rounded-full blur-2xl pointer-events-none"></div>
+
+            <h2 class="text-xl md:text-2xl font-mitr font-semibold text-center text-rose-700 mb-6 flex items-center justify-center gap-2">
+                <i class="fa-regular fa-clock text-rose-500"></i>
+                ระยะเวลาที่เราเดินเคียงข้างกันมา
+            </h2>
+
+            <!-- Counter Cards Grid -->
+            <!-- แก้ตรงนี้ให้ทั้ง 4 ช่องมีความกว้างเท่ากัน -->
+            <div class="grid grid-cols-2 md:grid-cols-[repeat(4,minmax(0,1fr))] gap-3 md:gap-4 text-center">
+
+                <!-- Days -->
+                <div class="bg-white/80 p-4 rounded-2xl shadow-sm border border-pink-100 flex flex-col justify-center min-w-0">
+                    <span
+                        id="countDays"
+                        class="text-3xl md:text-4xl font-extrabold text-rose-600 font-mitr truncate"
+                    >
+                        487
+                    </span>
+
+                    <span class="text-xs md:text-sm text-gray-600 font-sarabun mt-1">
+                        วัน (Days)
+                    </span>
+                </div>
+
+                <!-- Hours -->
+                <div class="bg-white/80 p-4 rounded-2xl shadow-sm border border-pink-100 flex flex-col justify-center min-w-0">
+                    <span
+                        id="countHours"
+                        class="text-3xl md:text-4xl font-extrabold text-rose-500 font-mitr truncate"
+                    >
+                        11,688
+                    </span>
+
+                    <span class="text-xs md:text-sm text-gray-600 font-sarabun mt-1">
+                        ชั่วโมง (Hours)
+                    </span>
+                </div>
+
+                <!-- Minutes -->
+                <div class="bg-white/80 p-4 rounded-2xl shadow-sm border border-pink-100 flex flex-col justify-center min-w-0">
+                    <span
+                        id="countMinutes"
+                        class="text-3xl md:text-4xl font-extrabold text-pink-500 font-mitr truncate"
+                    >
+                        701,280
+                    </span>
+
+                    <span class="text-xs md:text-sm text-gray-600 font-sarabun mt-1">
+                        นาที (Minutes)
+                    </span>
+                </div>
+
+                <!-- Seconds -->
+                <div class="bg-white/80 p-4 rounded-2xl shadow-sm border border-pink-100 flex flex-col justify-center min-w-0">
+                    <span
+                        id="countSeconds"
+                        class="text-3xl md:text-4xl font-extrabold text-purple-500 font-mitr truncate"
+                    >
+                        42,076,844
+                    </span>
+
+                    <span class="text-xs md:text-sm text-gray-600 font-sarabun mt-1">
+                        วินาที (Seconds)
+                    </span>
+                </div>
+
+            </div>
+
+            <p class="text-center text-xs text-rose-400 mt-4 font-sarabun">
+                * นัยสำคัญประมาณการจากระยะเวลา 1 ปี 4 เดือน (16 เดือนแห่งความสุข)
+            </p>
+        </section>
+
+        <!-- Interactive Letter / Love Card Flip Section -->
+        <section class="w-full max-w-xl mb-10">
+
+            <h2 class="text-xl md:text-2xl font-mitr font-semibold text-center text-rose-700 mb-4 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-envelope-open-text text-rose-500"></i>
+                การ์ดข้อความความในใจ
+            </h2>
+
+            <p class="text-center text-sm text-pink-600 mb-4 font-sarabun">
+                แตะหรือคลิกที่จดหมายด้านล่างเพื่อพลิกเปิดอ่านนะ 💕
+            </p>
+
+            <div
+                id="cardContainer"
+                class="w-full h-80 md:h-96 perspective-1000 cursor-pointer"
+                onclick="flipCard()"
+            >
+                <div
+                    id="cardInner"
+                    class="relative w-full h-full duration-700 transform-style-3d shadow-2xl rounded-3xl"
+                >
+
+                    <!-- Card Front -->
+                    <div class="absolute w-full h-full backface-hidden bg-gradient-to-br from-white via-pink-50 to-rose-100 rounded-3xl p-6 flex flex-col items-center justify-center border-2 border-rose-200 text-center">
+
+                        <div class="w-20 h-20 bg-rose-500/10 rounded-full flex items-center justify-center mb-4">
+                            <i class="fa-solid fa-heart text-4xl text-rose-500 animate-pulse"></i>
+                        </div>
+
+                        <h3 class="text-2xl font-mitr font-bold text-rose-600 mb-2">
+                            ถึงคนพิเศษของเค้า 💌
+                        </h3>
+
+                        <p class="text-gray-600 font-sarabun text-sm mb-4">
+                            กดตรงนี้เพื่อเปิดอ่านการ์ดข้อความวันครบรอบ
+                        </p>
+
+                        <span class="inline-flex items-center gap-2 bg-rose-500 text-white text-xs px-4 py-2 rounded-full font-medium shadow-md">
+                            คลิกเพื่อเปิดอ่าน
+                            <i class="fa-solid fa-hand-pointer"></i>
+                        </span>
+                    </div>
+
+                    <!-- Card Back -->
+                    <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-white/95 rounded-3xl p-6 md:p-8 flex flex-col justify-between border-2 border-pink-300 text-gray-800 overflow-y-auto">
+
+                        <div>
+
+                            <div class="flex justify-between items-center mb-3 border-b border-pink-100 pb-2">
+                                <span class="font-mitr font-semibold text-rose-600 text-base md:text-lg">
+                                    1 Year & 4 Months Together
+                                </span>
+
+                                <i class="fa-solid fa-quote-right text-rose-300 text-xl"></i>
+                            </div>
+
+                            <p class="text-sm md:text-base font-sarabun leading-relaxed text-gray-700">
+                                Happy Anniversary 1 ปี 4 เดือนนะคะ! 🌸
+                                <br/><br/>
+
+                                เวลาผ่านไปเร็วมากเลยเนอะ แป๊บเดียวเราก็เดินทางด้วยกันมาถึง 1.4 ปีแล้ว
+                                ขอบคุณสำหรับความใส่ใจ ความหวังดี และทุกรอยยิ้มที่มีให้กันเสมอมานะ
+                                ไม่ว่าจะวันไหนเค้าก็รู้สึกโชคดีเสมอที่มีเธออยู่ข้างๆ 💖
+
+                                <br/><br/>
+
+                                อยู่เติบโต เป็นความสุข และรักกันแบบนี้ไปนานๆ เลยนะคะ!
+                            </p>
+
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-pink-100 text-right">
+                            <span class="font-mitr text-sm text-rose-500 font-semibold">
+                                รักเธอที่สุดในโลกเลยนะ 💗
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Sweet Reason Cards Grid -->
+        <section class="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+
+            <div class="glass-card p-5 rounded-2xl border border-white/80 shadow-md text-center hover:-translate-y-1 transition-all duration-300">
+                <div class="text-3xl mb-2">🌸</div>
+
+                <h4 class="font-mitr text-rose-600 font-semibold mb-1">
+                    ความเข้าใจ
+                </h4>
+
+                <p class="text-xs text-gray-600 font-sarabun">
+                    ขอบคุณที่เข้าใจและรับฟังกันเสมอในทุกๆ เรื่องตลอด 1.4 ปีที่ผ่านมา
+                </p>
+            </div>
+
+            <div class="glass-card p-5 rounded-2xl border border-white/80 shadow-md text-center hover:-translate-y-1 transition-all duration-300">
+                <div class="text-3xl mb-2">🍬</div>
+
+                <h4 class="font-mitr text-rose-600 font-semibold mb-1">
+                    ความสดใส
+                </h4>
+
+                <p class="text-xs text-gray-600 font-sarabun">
+                    รอยยิ้มของเธอคือความสดใสและคือกำลังใจที่ดีที่สุดในทุกๆ วัน
+                </p>
+            </div>
+
+            <div class="glass-card p-5 rounded-2xl border border-white/80 shadow-md text-center hover:-translate-y-1 transition-all duration-300">
+                <div class="text-3xl mb-2">✨</div>
+
+                <h4 class="font-mitr text-rose-600 font-semibold mb-1">
+                    อนาคตร่วมกัน
+                </h4>
+
+                <p class="text-xs text-gray-600 font-sarabun">
+                    ตื่นเต้นที่จะได้สร้างความทรงจำดีๆ และก้าวเข้าสู่อนาคตไปด้วยกันอีกนะ
+                </p>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Simple Heart Footer -->
+    <footer class="py-6 text-center text-rose-600 font-sarabun text-sm z-10">
+        <p>
+            Created with
+            <i class="fa-solid fa-heart text-red-500 animate-bounce"></i>
+            for Our 1.4 Years Anniversary
+        </p>
+    </footer>
+
+    <!-- Web Audio API Synthesizer Script -->
+    <script>
+
+        // Web Audio API ambient music synth
+        let audioCtx = null;
+        let isPlaying = false;
+        let activeNodes = [];
+        let musicTimer = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Play soft romantic chime notes
+        function playRomanticChime() {
+
+            if (!isPlaying || !audioCtx) return;
+
+            const notes = [
+                261.63,
+                293.66,
+                329.63,
+                349.23,
+                392.00,
+                440.00,
+                523.25,
+                587.33,
+                659.25
+            ];
+
+            const freq = notes[Math.floor(Math.random() * notes.length)];
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(
+                freq,
+                audioCtx.currentTime
+            );
+
+            // Envelope
+            gain.gain.setValueAtTime(
+                0,
+                audioCtx.currentTime
+            );
+
+            gain.gain.linearRampToValueAtTime(
+                0.08,
+                audioCtx.currentTime + 0.3
+            );
+
+            gain.gain.exponentialRampToValueAtTime(
+                0.0001,
+                audioCtx.currentTime + 3.0
+            );
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+
+            osc.stop(
+                audioCtx.currentTime + 3.2
+            );
+
+            // Schedule next note
+            const nextTime = Math.random() * 800 + 400;
+
+            musicTimer = setTimeout(
+                playRomanticChime,
+                nextTime
+            );
+        }
+
+        function toggleMusic() {
+
+            initAudio();
+
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const musicIcon =
+                document.getElementById('musicIcon');
+
+            const musicText =
+                document.getElementById('musicText');
+
+            const musicBars =
+                document.getElementById('musicBars');
+
+            if (!isPlaying) {
+
+                isPlaying = true;
+
+                musicIcon.classList.add('hidden');
+
+                musicBars.classList.remove('hidden');
+
+                musicBars.classList.add('flex');
+
+                musicText.textContent =
+                    'เล่นเพลงอยู่';
+
+                playRomanticChime();
+
+            } else {
+
+                isPlaying = false;
+
+                clearTimeout(musicTimer);
+
+                musicIcon.classList.remove('hidden');
+
+                musicBars.classList.add('hidden');
+
+                musicBars.classList.remove('flex');
+
+                musicText.textContent =
+                    'เปิดดนตรีบรรยากาศ';
+            }
+        }
+
+    </script>
+
+    <script>
+
+        /* Floating Canvas Heart Background */
+
+        const canvas =
+            document.getElementById('bgCanvas');
+
+        const ctx =
+            canvas.getContext('2d');
+
+        let width =
+            canvas.width = window.innerWidth;
+
+        let height =
+            canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+
+            width =
+                canvas.width = window.innerWidth;
+
+            height =
+                canvas.height = window.innerHeight;
+
+        });
+
+        // Heart particle class
+        class FloatingHeart {
+
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+
+                this.x =
+                    Math.random() * width;
+
+                this.y =
+                    height + Math.random() * 50;
+
+                this.size =
+                    Math.random() * 14 + 8;
+
+                this.speedY =
+                    Math.random() * 1.5 + 0.5;
+
+                this.speedX =
+                    (Math.random() - 0.5) * 0.8;
+
+                this.opacity =
+                    Math.random() * 0.5 + 0.3;
+
+                this.color =
+                    `hsla(${Math.random() * 40 + 330}, 85%, 70%, ${this.opacity})`;
+
+                this.rotation =
+                    Math.random() * Math.PI * 2;
+
+                this.rotSpeed =
+                    (Math.random() - 0.5) * 0.02;
+            }
+
+            update() {
+
+                this.y -= this.speedY;
+
+                this.x += this.speedX;
+
+                this.rotation += this.rotSpeed;
+
+                if (
+                    this.y < -20 ||
+                    this.x < -20 ||
+                    this.x > width + 20
+                ) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+
+                ctx.save();
+
+                ctx.translate(
+                    this.x,
+                    this.y
+                );
+
+                ctx.rotate(
+                    this.rotation
+                );
+
+                ctx.fillStyle =
+                    this.color;
+
+                // Draw heart shape
+                ctx.beginPath();
+
+                const topCurveHeight =
+                    this.size * 0.3;
+
+                ctx.moveTo(
+                    0,
+                    topCurveHeight
+                );
+
+                ctx.bezierCurveTo(
+                    0,
+                    0,
+                    -this.size / 2,
+                    0,
+                    -this.size / 2,
+                    topCurveHeight
+                );
+
+                ctx.bezierCurveTo(
+                    -this.size / 2,
+                    (this.size + topCurveHeight) / 2,
+                    0,
+                    this.size,
+                    0,
+                    this.size
+                );
+
+                ctx.bezierCurveTo(
+                    0,
+                    this.size,
+                    this.size / 2,
+                    (this.size + topCurveHeight) / 2,
+                    this.size / 2,
+                    topCurveHeight
+                );
+
+                ctx.bezierCurveTo(
+                    this.size / 2,
+                    0,
+                    0,
+                    0,
+                    0,
+                    topCurveHeight
+                );
+
+                ctx.closePath();
+
+                ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
+        // Initialize particles
+        const hearts = [];
+
+        const heartCount =
+            Math.min(
+                Math.floor(width / 20),
+                40
+            );
+
+        for (
+            let i = 0;
+            i < heartCount;
+            i++
+        ) {
+
+            const h =
+                new FloatingHeart();
+
+            h.y =
+                Math.random() * height;
+
+            hearts.push(h);
+        }
+
+        function animateCanvas() {
+
+            ctx.clearRect(
+                0,
+                0,
+                width,
+                height
+            );
+
+            hearts.forEach(h => {
+
+                h.update();
+
+                h.draw();
+
+            });
+
+            requestAnimationFrame(
+                animateCanvas
+            );
+        }
+
+        // Live Counter Calculation
+        const daysElem =
+            document.getElementById('countDays');
+
+        const hoursElem =
+            document.getElementById('countHours');
+
+        const minutesElem =
+            document.getElementById('countMinutes');
+
+        const secondsElem =
+            document.getElementById('countSeconds');
+
+        // 1 Year = 365 days
+        // 4 Months = approximately 122 days
+        // Total = approximately 487 days
+
+        const now =
+            new Date();
+
+        const startDate =
+            new Date(
+                now.getTime() -
+                (487 * 24 * 60 * 60 * 1000)
+            );
+
+        function updateCounter() {
+
+            const current =
+                new Date();
+
+            const diffTime =
+                Math.abs(
+                    current - startDate
+                );
+
+            const days =
+                Math.floor(
+                    diffTime /
+                    (1000 * 60 * 60 * 24)
+                );
+
+            const hours =
+                Math.floor(
+                    diffTime /
+                    (1000 * 60 * 60)
+                );
+
+            const minutes =
+                Math.floor(
+                    diffTime /
+                    (1000 * 60)
+                );
+
+            const seconds =
+                Math.floor(
+                    diffTime / 1000
+                );
+
+            daysElem.textContent =
+                days.toLocaleString();
+
+            hoursElem.textContent =
+                hours.toLocaleString();
+
+            minutesElem.textContent =
+                minutes.toLocaleString();
+
+            secondsElem.textContent =
+                seconds.toLocaleString();
+        }
+
+        setInterval(
+            updateCounter,
+            1000
+        );
+
+        updateCounter();
+
+        function triggerHeartBurst(event) {
+
+            // Heart shapes with canvas-confetti
+            const scalar = 2;
+
+            const heart =
+                confetti.shapeFromPath({
+                    path: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'
+                });
+
+            // Position from button
+            const rect =
+                event.target.getBoundingClientRect();
+
+            const x =
+                (rect.left + rect.width / 2) /
+                window.innerWidth;
+
+            const y =
+                (rect.top + rect.height / 2) /
+                window.innerHeight;
+
+            confetti({
+
+                shapes: [heart],
+
+                particleCount: 40,
+
+                spread: 80,
+
+                origin: {
+                    x: x,
+                    y: y
+                },
+
+                colors: [
+                    '#FF1493',
+                    '#FF69B4',
+                    '#FFB6C1',
+                    '#E91E63',
+                    '#DA70D6'
+                ],
+
+                scalar: 1.5,
+
+                drift: 0,
+
+                ticks: 200
+            });
+
+            // Extra side bursts
+            confetti({
+
+                particleCount: 25,
+
+                angle: 60,
+
+                spread: 55,
+
+                origin: {
+                    x: 0
+                },
+
+                colors: [
+                    '#FFB6C1',
+                    '#FF80AB',
+                    '#E1BEE7'
+                ]
+            });
+
+            confetti({
+
+                particleCount: 25,
+
+                angle: 120,
+
+                spread: 55,
+
+                origin: {
+                    x: 1
+                },
+
+                colors: [
+                    '#FFB6C1',
+                    '#FF80AB',
+                    '#E1BEE7'
+                ]
+            });
+        }
+
+        // Card Flip logic
+        function flipCard() {
+
+            const cardInner =
+                document.getElementById(
+                    'cardInner'
+                );
+
+            cardInner.classList.toggle(
+                'rotate-y-180'
+            );
+        }
+
+        // Start animation loop on window load
+        window.onload = function() {
+            animateCanvas();
+        };
+
+    </script>
+
+</body>
+</html>
